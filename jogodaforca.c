@@ -13,12 +13,13 @@ int main()
   do
   {
     char chute;
-    scanf("%c", chute);
+    scanf("%c", &chute);
 
     // strlen = Conta o número de letras na palavra
     for(int i = 0; i < strlen(palavraSecreta); i++){
+      printf("Estou vendo a letra %c na posicao %d\n", palavraSecreta[i], i);
       if(palavraSecreta[i] == chute){
-        printf("A posição %d tem essa letra\n", i);
+        printf("A posicao %d tem essa letra\n", i);
       }
     }
 
