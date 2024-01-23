@@ -1,64 +1,75 @@
 #include <stdio.h>
 #include <string.h>
-int main()
-{
-  char palavraSecreta[20];
 
-  sprintf(palavraSecreta, "MELANCIA");
+char palavrasecreta[20];
+char chutes[26];
+int tentativas = 0;
 
-  int acertou = 0;
-  int enforcou = 0;
+void abertura() {
+    printf("/****************/\n");
+    printf("/ Jogo de Forca */\n");
+    printf("/****************/\n\n");
+}
 
-  char chutes[26];
-  int tentativas = 0;
-
-  // Primeiro ele roda o loop uma vez e depois verifica a condição
-  do
-  {
-
-    for (int i = 0; i < strlen(palavraSecreta); i++)
-    {
-
-      int achou = 0;
-
-      // printf("Estou vendo a letra secreta %d %c\n",i, palavraSecreta[i]);
-
-      for (int j = 0; j < tentativas; j++)
-      {
-        // printf("-> Chute %d %c\n",j, chutes[j]);
-        if (chutes[j] == palavraSecreta[i])
-        {
-          // printf("---> Chute Correto\n");
-          achou = 1;
-          break;
-        }
-      }
-
-      if (achou)
-      {
-        printf("%c ", palavraSecreta[i]);
-      }
-      else
-      {
-        printf("_ ");
-      }
-    };
-
-    printf("\n");
-
+void chuta() {
     char chute;
+    printf("Qual letra? ");
     scanf(" %c", &chute);
 
     chutes[tentativas] = chute;
-    tentativas++;
+}
 
-    // strlen = Conta o número de letras na palavra
-    // for(int i = 0; i < strlen(palavraSecreta); i++){
-    //   printf("Estou vendo a letra %c na posicao %d\n", palavraSecreta[i], i);
-    //   if(palavraSecreta[i] == chute){
-    //     printf("A posicao %d tem essa letra\n", i);
-    //   }
-    // }
+// Essa função não foi discutida no último vídeo
+int jachutou(char letra) {
+    int achou = 0;
+    for(int j = 0; j < tentativas; j++) {
+        if(chutes[j] == letra) {
+            achou = 1;
+            break;
+        }
+    }
 
-  } while (!acertou && !enforcou);
+    return achou;
+}
+
+// Essa função não foi discutida no último vídeo
+void desenhaforca() {
+
+    printf("Você já deu %d chutes\n", tentativas);
+
+    for(int i = 0; i < strlen(palavrasecreta); i++) {
+
+        if(jachutou(palavrasecreta[i])) {
+            printf("%c ", palavrasecreta[i]);
+        } else {
+            printf("_ ");
+        }
+
+    }
+    printf("\n");
+
+}
+
+// Essa função não foi discutida no último vídeo
+void escolhepalavra() {
+    sprintf(palavrasecreta, "MELANCIA");
+}
+
+int main() {
+
+    int acertou = 0;
+    int enforcou = 0;
+
+    abertura();
+    escolhepalavra();
+
+    do {
+
+        desenhaforca();
+        chuta();
+
+        tentativas++;
+
+    } while (!acertou && !enforcou);
+
 }
