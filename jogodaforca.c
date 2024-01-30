@@ -1,29 +1,65 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <time.h>
+
+// Header Files
+#include "jogodaforca.h"
 
 char palavrasecreta[20];
 char chutes[26];
-int tentativas = 0;
+int chutesdados = 0;
 
-void abertura() {
+int enforcou()
+{
+
+    int erros = 0;
+
+    for (int i = 0; i < chutesdados; i++)
+    {
+
+        int existe = 0;
+
+        for (int j = 0; j < strlen(palavrasecreta); j++)
+        {
+            if (chutes[i] == palavrasecreta[j])
+            {
+                existe = 1;
+                break;
+            }
+        }
+
+        if (!existe)
+            erros++;
+    }
+
+    return erros >= 5;
+}
+
+void abertura()
+{
     printf("/****************/\n");
     printf("/ Jogo de Forca */\n");
     printf("/****************/\n\n");
 }
 
-void chuta() {
+void chuta()
+{
     char chute;
     printf("Qual letra? ");
     scanf(" %c", &chute);
 
-    chutes[tentativas] = chute;
+    chutes[chutesdados] = chute;
+    chutesdados++;
 }
 
-// Essa função não foi discutida no último vídeo
-int jachutou(char letra) {
+int jachutou(char letra)
+{
     int achou = 0;
-    for(int j = 0; j < tentativas; j++) {
-        if(chutes[j] == letra) {
+    for (int j = 0; j < chutesdados; j++)
+    {
+        if (chutes[j] == letra)
+        {
             achou = 1;
             break;
         }
@@ -32,44 +68,123 @@ int jachutou(char letra) {
     return achou;
 }
 
-// Essa função não foi discutida no último vídeo
-void desenhaforca() {
+int ganhou()
+{
+    for (int i = 0; i < strlen(palavrasecreta); i++)
+    {
+        if (!jachutou(palavrasecreta[i]))
+        {
+            return 0;
+        }
+    }
 
-    printf("Você já deu %d chutes\n", tentativas);
+    return 1;
+}
 
-    for(int i = 0; i < strlen(palavrasecreta); i++) {
+void desenhaforca()
+{
 
-        if(jachutou(palavrasecreta[i])) {
+    printf("Você já deu %d chutes\n", chutesdados);
+
+    for (int i = 0; i < strlen(palavrasecreta); i++)
+    {
+
+        if (jachutou(palavrasecreta[i]))
+        {
             printf("%c ", palavrasecreta[i]);
-        } else {
+        }
+        else
+        {
             printf("_ ");
         }
-
     }
     printf("\n");
-
 }
 
-// Essa função não foi discutida no último vídeo
-void escolhepalavra() {
-    sprintf(palavrasecreta, "MELANCIA");
+void adicionaPalavra()
+{
+    char quer;
+    printf("Voce deseja adicionar uma palavra no jogo (S/N)? ");
+    scanf(" %c", &quer);
+
+    if (quer == 'S')
+    {
+        char novaPalavra[20];
+        printf("Qual a nova palavra que deseja digitar? ");
+        scanf("%s", novaPalavra);
+
+        FILE *f;
+        f = fopen("palavrasForca.txt", "r+");
+
+        if (quer == 0)
+        {
+            printf("Desculpe, banco de dados não disponível!\n\n");
+            exit(1);
+        }
+        // Pegando a quantidade de palavras que está no arquivo mostrado na primeira linha
+        int qntd;
+        fscanf(f, "%d", &qntd);
+        qntd++;
+
+        // Posiciona o cursor no arquivo
+        fseek(f, 0, SEEK_SET);
+        fprintf(f, "%d", qntd);
+
+        fseek(f, 0, SEEK_END);
+        fprintf(f, "\n%s", novaPalavra);
+
+        fclose(f);
+    }
 }
 
-int main() {
+void escolhepalavra()
+{
+    FILE *f;
 
-    int acertou = 0;
-    int enforcou = 0;
+    // Abrir arquivo
+    f = fopen("palavrasForca.txt", "r");
+    if (f == 0)
+    {
+        printf("Desculpe, banco de dados não disponível!\n\n");
+        exit(1);
+    }
+
+    int qntdPalavras;
+    // Abrir o arquivo e ler a quantidade de palavra que está na primeira linha
+    // Ler a quantidade de palavras
+    // Ele sempre le sequencialmente
+    fscanf(f, "%d", &qntdPalavras);
+
+    srand(time(0));
+    // A função rand() gera um número aleatório
+    // A função % pega o resto da divisão
+    // A função rand() % qntdPalavras gera um número aleatório entre 0 e qntdPalavras - 1
+    int numRandow = rand() % qntdPalavras;
+
+    for (int i = 0; i <= numRandow; i++)
+    {
+        // Ler a palavra do arquivo
+        // Ele sempre le sequencialmente
+        fscanf(f, "%s", palavrasecreta);
+    }
+
+    // Fechar Arquivo
+    fclose(f);
+}
+
+int main()
+{
 
     abertura();
     escolhepalavra();
 
-    do {
+    do
+    {
 
         desenhaforca();
         chuta();
 
-        tentativas++;
+    } while (!ganhou() && !enforcou());
 
-    } while (!acertou && !enforcou);
-
+    adicionaPalavra();
 }
